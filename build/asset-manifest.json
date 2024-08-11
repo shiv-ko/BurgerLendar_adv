@@ -1,0 +1,18 @@
+{
+  "files": {
+    "main.css": "/static/css/main.0d772646.css",
+    "main.js": "/static/js/main.0a5c8ac7.js",
+    "static/js/453.5565870f.chunk.js": "/static/js/453.5565870f.chunk.js",
+    "static/media/akinator.png": "/static/media/akinator.1d1eb18d94f060558d70.png",
+    "static/media/11543-removebg-preview.png": "/static/media/11543-removebg-preview.92ebdff7ab8ebf8381f7.png",
+    "static/media/poteto_icon.png": "/static/media/poteto_icon.168f69f1fcb2822cc530.png",
+    "index.html": "/index.html",
+    "main.0d772646.css.map": "/static/css/main.0d772646.css.map",
+    "main.0a5c8ac7.js.map": "/static/js/main.0a5c8ac7.js.map",
+    "453.5565870f.chunk.js.map": "/static/js/453.5565870f.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.0d772646.css",
+    "static/js/main.0a5c8ac7.js"
+  ]
+}
