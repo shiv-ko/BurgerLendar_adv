@@ -3,7 +3,7 @@ import { doc, setDoc, getDoc } from "firebase/firestore";
 import { auth, db } from "../../firebase/firebase"; // Import the initialized Firestore instance
 import { onAuthStateChanged } from "firebase/auth";
 import axios from "axios";
-import Unity, { UnityContext } from "react-unity-webgl";
+
 
 interface ScheduledTask {
   title: string;

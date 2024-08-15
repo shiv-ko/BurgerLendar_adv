@@ -19,6 +19,8 @@ import { onAuthStateChanged } from "firebase/auth";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Loading from "./loading/welcometoBurger"; // Import the Loading component
+import './education.css';
+
 
 interface EduProps {
   setOutput: (output: string) => void;
@@ -301,19 +303,19 @@ const Edu: React.FC<EduProps> = ({ setOutput, mode }) => {
   };
 
   return (
-    <div style={styles.container}>
-      <header style={styles.header}>
-        <h1 style={styles.title}>Welcome to</h1>
-        <h1 style={styles.mainTitle}>BurgerLendar</h1>
+    <div className="container">
+      <header className="header">
+        <h1 className="title">Welcome to</h1>
+        <h1 className="mainTitle">BurgerLendar</h1>
       </header>
-      <main style={styles.main}>
+      <main className="main">
         <img
           src="https://thumb.ac-illust.com/36/36ac3e42b8ed38dce15bc0ad7c5e9a1c_t.jpeg"
-          alt="burger"
-          style={styles.burgerImage}
+          alt="burgerImage"
+          className="burgerImage"
         />
-        <div style={styles.username}>{userName}</div>
-        <div style={styles.quote}>
+        <div className="username">{userName}</div>
+        <div className="quote">
           {quote ? (
             <div
               style={{
@@ -339,52 +341,6 @@ const Edu: React.FC<EduProps> = ({ setOutput, mode }) => {
   );
 };
 
-const styles = {
-  container: {
-    display: "flex",
-    flexDirection: "column" as "column",
-    alignItems: "center",
-    justifyContent: "center",
-    height: "100vh",
-    backgroundColor: "#003366",
-    color: "#F9ECCB",
-    textAlign: "center" as "center",
-  },
-  header: {
-    marginBottom: "20px",
-  },
-  title: {
-    fontSize: "1.5em",
-    margin: "0",
-    color: "#F9ECCB",
-  },
-  mainTitle: {
-    fontSize: "2.5em",
-    margin: "0",
-    color: "#F9ECCB",
-  },
-  main: {
-    display: "flex",
-    flexDirection: "column" as "column",
-    alignItems: "center",
-    backgroundColor: "#003366",
-    padding: "20px",
-    borderRadius: "10px",
-  },
-  burgerImage: {
-    width: "150px",
-    height: "150px",
-  },
-  username: {
-    marginTop: "20px",
-    fontSize: "1.2em",
-    color: "#F9ECCB",
-  },
-  quote: {
-    marginTop: "10px",
-    fontSize: "1em",
-    color: "#F9ECCB",
-  },
-};
+
 
 export default Edu;

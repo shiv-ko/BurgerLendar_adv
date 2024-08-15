@@ -4,7 +4,7 @@ import { getFirestore, collection, getDocs, doc, getDoc } from "firebase/firesto
 import { getStorage, ref as storageRef, getDownloadURL, uploadString } from "firebase/storage";
 import Unity, { UnityContext } from "react-unity-webgl";
 import html2canvas from "html2canvas";
-import Poteto from "./poteto_icon.png";
+
 
 interface UnityInstanceUrls {
   dataUrl: string;
@@ -225,7 +225,7 @@ const Memories: React.FC = () => {
           </div>
           {burgerConfig && (
             <button onClick={saveScreenshot} style={{ marginLeft: "10px", alignSelf: "center" }}>
-              <img src={Poteto} alt="Save Screenshot" />
+              <img src='/image/poteto_icon.png' alt="poteto_icon" />
             </button>
           )}
         </div>
