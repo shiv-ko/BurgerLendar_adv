@@ -19,6 +19,8 @@ import { onAuthStateChanged } from "firebase/auth";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Loading from "./loading/welcometoBurger"; // Import the Loading component
+import './GPT.css';
+
 
 interface EduProps {
   setOutput: (output: string) => void;
@@ -61,7 +63,6 @@ const Edu: React.FC<EduProps> = ({ setOutput, mode }) => {
   const [userName, setUserName] = useState<any>(null);
   const [quote, setQuote] = useState<Quote | null>(null);
   const [today, setToday] = useState<string>("");
-  const [countdata, setcountdata] = useState<number>(0);
   const [scheduleText, setScheduleText] = useState<string>(""); // State to hold the generated schedule text
   const [isLoading, setIsLoading] = useState<boolean>(true); // State to manage loading status
   const navigate = useNavigate(); // Use the useNavigate hook from React Router
@@ -101,20 +102,36 @@ const Edu: React.FC<EduProps> = ({ setOutput, mode }) => {
   }, [mode]);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      if (currentUser) {
-        setUser(currentUser);
-        fetchEvents(currentUser.uid);
-        fetchtodos(currentUser.uid);
-        fetchUserName(currentUser.uid);
-        fetchUserAki(currentUser.uid);
-      } else {
-        setUser(null);
-      }
-    });
+  const fetchData = async (userId: string) => {
+    try {
+      // 並行してすべてのデータ取得処理を実行し、完了を待つ
+      const [eventsData, todosData, userName, akiData] = await Promise.all([
+        fetchEvents(userId),
+        fetchEvents(userId),
+        fetchUserName(userId),
+        fetchUserAki(userId)
+      ]);
 
-    return () => unsubscribe();
-  }, []);
+      
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    if (currentUser) {
+      setUser(currentUser);
+      // データ取得処理を呼び出す
+      fetchData(currentUser.uid);
+      handleSubmit();
+    } else {
+      setUser(null);
+    }
+  });
+
+  return () => unsubscribe();
+}, []);
+
 
   /////////////////////////////////////////////////////////
   async function fetchUserAki(userId: string) {
@@ -124,7 +141,6 @@ const Edu: React.FC<EduProps> = ({ setOutput, mode }) => {
       const data = docSnap.data() as aki;
       console.log("aki", data);
       setAki(data);
-      setcountdata(countdata + 1);
       if (docSnap.exists()) {
       } else {
         console.log("No such document!");
@@ -136,7 +152,7 @@ const Edu: React.FC<EduProps> = ({ setOutput, mode }) => {
 
   const fetchEvents = async (userId: string) => {
     try {
-      const eventsRef = query(collection(db, "users", userId, "events"));
+      const eventsRef = query(collection(db, "Users_Act", userId, "events"));
       const querySnapshot = await getDocs(eventsRef);
       const fetchedEvents = querySnapshot.docs.map((doc) => ({
         date: doc.data().date,
@@ -153,7 +169,7 @@ const Edu: React.FC<EduProps> = ({ setOutput, mode }) => {
 
   const fetchtodos = async (userId: string) => {
     try {
-      const eventsRef = query(collection(db, "users", userId, "todos"));
+      const eventsRef = query(collection(db, "users_Act", userId, "todos"));
       const querySnapshot = await getDocs(eventsRef);
       const fetchedTodos = querySnapshot.docs.map((doc) => ({
         Title: doc.data().text,
@@ -161,7 +177,6 @@ const Edu: React.FC<EduProps> = ({ setOutput, mode }) => {
       }));
       console.log("todos", fetchedTodos);
       setScheduleTasks(fetchedTodos);
-      setcountdata(countdata + 1);
     } catch (err) {
       throw new Error("Error fetching user data:");
     }
@@ -175,7 +190,6 @@ const Edu: React.FC<EduProps> = ({ setOutput, mode }) => {
         const data = docSnap.data();
         console.log("username", data?.displayName);
         setUserName(data?.displayName);
-        setcountdata(countdata + 1);
       } else {
         console.log("No such document in Users!");
       }
@@ -184,12 +198,7 @@ const Edu: React.FC<EduProps> = ({ setOutput, mode }) => {
     }
   };
 
-  useEffect(() => {
-    if (countdata < 1) {
-      return;
-    }
-    handleSubmit();
-  }, [countdata]);
+  
 
   const handleSubmit = async () => {
     console.log("aki in handlesubmit", Aki);
@@ -237,9 +246,9 @@ const Edu: React.FC<EduProps> = ({ setOutput, mode }) => {
     hh:mm - Schedule Title
 
     If there is no task, do not write anything about the task.
-    Dont't put in schedule other than the given data. 
+    Don't put in schedule other than the given data. 
 
-    Generate a schedule considering the best times to fit the tasks around the fixed schedule items, optimizing productivity based on the motivation level.
+    Generate ONLY schedule considering the best times to fit the tasks around the fixed schedule items, optimizing productivity based on the motivation level.
         `;
 
     try {
@@ -301,19 +310,19 @@ const Edu: React.FC<EduProps> = ({ setOutput, mode }) => {
   };
 
   return (
-    <div style={styles.container}>
-      <header style={styles.header}>
-        <h1 style={styles.title}>Welcome to</h1>
-        <h1 style={styles.mainTitle}>BurgerLendar</h1>
+    <div className="container">
+      <header className="header">
+        <h1 className="title">Welcome to</h1>
+        <h1 className="mainTitle">BurgerLendar</h1>
       </header>
-      <main style={styles.main}>
+      <main className="main">
         <img
           src="https://thumb.ac-illust.com/36/36ac3e42b8ed38dce15bc0ad7c5e9a1c_t.jpeg"
-          alt="burger"
-          style={styles.burgerImage}
+          alt="burgerImage"
+          className="burgerImage"
         />
-        <div style={styles.username}>{userName}</div>
-        <div style={styles.quote}>
+        <div className="username">{userName}</div>
+        <div className="quote">
           {quote ? (
             <div
               style={{
@@ -339,52 +348,6 @@ const Edu: React.FC<EduProps> = ({ setOutput, mode }) => {
   );
 };
 
-const styles = {
-  container: {
-    display: "flex",
-    flexDirection: "column" as "column",
-    alignItems: "center",
-    justifyContent: "center",
-    height: "100vh",
-    backgroundColor: "#003366",
-    color: "#F9ECCB",
-    textAlign: "center" as "center",
-  },
-  header: {
-    marginBottom: "20px",
-  },
-  title: {
-    fontSize: "1.5em",
-    margin: "0",
-    color: "#F9ECCB",
-  },
-  mainTitle: {
-    fontSize: "2.5em",
-    margin: "0",
-    color: "#F9ECCB",
-  },
-  main: {
-    display: "flex",
-    flexDirection: "column" as "column",
-    alignItems: "center",
-    backgroundColor: "#003366",
-    padding: "20px",
-    borderRadius: "10px",
-  },
-  burgerImage: {
-    width: "150px",
-    height: "150px",
-  },
-  username: {
-    marginTop: "20px",
-    fontSize: "1.2em",
-    color: "#F9ECCB",
-  },
-  quote: {
-    marginTop: "10px",
-    fontSize: "1em",
-    color: "#F9ECCB",
-  },
-};
+
 
 export default Edu;

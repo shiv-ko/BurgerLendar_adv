@@ -12,7 +12,7 @@ import {
   IconButton
 } from "@mui/material";
 import { getFirestore, collection, doc, setDoc, serverTimestamp } from "firebase/firestore";
-import { auth } from "../firebase/firebase"; // authだけをインポートする
+import { auth } from "../../firebase/firebase"; // authだけをインポートする
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 

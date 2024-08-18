@@ -7,6 +7,7 @@ import Unity, { UnityContext } from "react-unity-webgl";
 import { Button } from "@headlessui/react";
 import "../App.css";
 import axios from "axios";
+import CompletedScheduleList from "./Home/GenerateBurger";
 
 interface UnityInstanceUrls {
   dataUrl: string;

@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
-import { auth, db } from "../firebase/firebase";
+import { auth, db } from "../../firebase/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import Akinator from "./akinator.png"; 
-import useViewportHeight from "../hooks/useViewportHeight"; // Import the custom hook
+import useViewportHeight from "../../hooks/useViewportHeight"; // Import the custom hook
 
 const LaunAki: React.FC = () => {
   const [launPerWeek, setlaunPerWeek] = useState<number | "">("");
@@ -81,7 +80,8 @@ const LaunAki: React.FC = () => {
         ) : (
           <>
             <div style={styles.questionContainer}>
-              <img src={Akinator} alt="My Image" />
+              <img src="/image/akinator.png" alt="Akinator" 
+              />
               <h2 style={styles.question}>質問4/5:</h2>
               <p style={styles.subQuestion}>洗濯を週何回の頻度でしますか？</p>
             </div>

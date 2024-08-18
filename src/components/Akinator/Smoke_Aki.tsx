@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
-import { auth, db } from "../firebase/firebase";
+import { auth, db } from "../../firebase/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import Akinator from "./akinator.png"; // 画像のインポート
-import useViewportHeight from "../hooks/useViewportHeight"; // Import the custom hook
+import useViewportHeight from "../../hooks/useViewportHeight"; // Import the custom hook
 
 const Aki_Smoke: React.FC = () => {
   const [user, setUser] = useState<any>(null);
@@ -66,11 +65,9 @@ const Aki_Smoke: React.FC = () => {
         <h1 style={styles.title}>BurgerNator</h1>
       </header>
       <main style={styles.main}>
-        <img
-          src={Akinator}
-          alt="My Image"
-          style={{ width: "90%", height: "60%" }}
-        />
+        <img src="/image/akinator.png" alt="Akinator" 
+              style={{ width: "90%", height: "60%" }}
+              />
         {showCheckmark ? (
           <CheckCircleOutlineIcon style={styles.checkmark} />
         ) : (

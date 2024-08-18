@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { db, auth } from "../../firebase/firebase";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc,collection } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 
 interface ScheduleEvent {
@@ -79,11 +79,12 @@ const Home: React.FC<HomeProps> = ({ output }) => {
     return year + month + day;
   }
 
-  const handleAddEvent = async (userId: string) => {
+  const handleAddSchedule = async (userId: string) => {
     const currentDate = getCurrentDateFormatted();
 
     try {
-      const docRef = doc(db, "schedule", userId, "schedule", currentDate);
+      // Users_Schedule コレクション -> userId ドキュメント -> schedule サブコレクション -> currentDate ドキュメント
+      const docRef = doc(db, "Users_Schedule", userId, "schedule", currentDate);
       console.log(currentDate);
       await setDoc(docRef, { scheduleEvents });
       console.log("Event has been added!");
@@ -92,6 +93,9 @@ const Home: React.FC<HomeProps> = ({ output }) => {
       console.log("Failed to add event");
     }
   };
+
+
+
 
   const formatSchedule = (text: string) => {
     const pattern = /(\d{2}:\d{2}) - ([^\.]+\.) /g;
@@ -106,7 +110,7 @@ const Home: React.FC<HomeProps> = ({ output }) => {
   }, [output]);
 
   useEffect(() => {
-    handleAddEvent(userid);
+    handleAddSchedule(userid);
     if (currentEventRef.current) {
       currentEventRef.current.scrollIntoView({
         behavior: "smooth",
@@ -114,6 +118,7 @@ const Home: React.FC<HomeProps> = ({ output }) => {
       });
     }
   }, [scheduleEvents]);
+
 
   const toggleCheck = (index: number) => {
     const newCheckedEvents = new Set(checkedEvents);

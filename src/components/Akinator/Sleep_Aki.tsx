@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
-import { auth, db } from "../firebase/firebase";
+import { auth, db } from "../../firebase/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import Akinator from "./akinator.png"; //
-import useViewportHeight from "../hooks/useViewportHeight"; // Import the custom hook
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import useViewportHeight from "../../hooks/useViewportHeight"; // Import the custom hook
 
 const Aki_Sleep: React.FC = () => {
   const [sleepPerDay, setSleepPerDay] = useState<number | "">("");
@@ -78,13 +77,11 @@ const Aki_Sleep: React.FC = () => {
         ) : (
           <>
             <div style={styles.questionContainer}>
-              <img
-                src={Akinator}
-                alt="My Image"
-                style={{ width: "85%", height: "90%" }}
+              <img src="/image/akinator.png" alt="Akinator" 
+              style={{ width: "85%", height: "90%" }}
               />
               <h2 style={styles.question}>質問3/4:</h2>
-              <p style={styles.subQuestion}>睡眠どれくらいしますか？</p>
+              <p style={styles.subQuestion}>一日何時間寝ますか？</p>
             </div>
             <div style={styles.optionsContainer}>
               <input
