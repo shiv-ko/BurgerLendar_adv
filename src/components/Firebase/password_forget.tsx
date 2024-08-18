@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // React RouterのuseNavigateフックをインポート
-import { auth } from '../firebase/firebase';
+import { auth } from '../../firebase/firebase';
 import { sendPasswordResetEmail } from 'firebase/auth';
 
 const ForgetPassword: React.FC = () => {

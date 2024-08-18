@@ -1,4 +1,4 @@
-// components/chatGPT/loading/welcometoBurger.tsx
+
 import React, { useState, useEffect } from "react";
 import { Quote, MotivationQuotes, NonMotivationQuotes, DefoMotivationQuotes } from "./data";
 import { auth } from "../../../firebase/firebase"; // Import the initialized Firestore instance
@@ -53,8 +53,8 @@ const Loading: React.FC<{ mode: string }> = ({ mode }) => {
       </header>
       <main style={styles.main}>
         <img
-          src="https://thumb.ac-illust.com/36/36ac3e42b8ed38dce15bc0ad7c5e9a1c_t.jpeg"
-          alt="burger"
+          src="/image/burgerIcon.png"
+          alt="burgerIcon"
           style={styles.burgerImage}
         />
         <div style={styles.username}>{user}</div>

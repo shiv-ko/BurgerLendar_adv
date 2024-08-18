@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { collection, doc, setDoc, serverTimestamp } from "firebase/firestore";
-import { auth, db } from "../firebase/firebase"; // Import the initialized Firestore instance
+import { auth, db } from "../../firebase/firebase"; // Import the initialized Firestore instance
 import { onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom"; // useNavigateをインポート
-import Akinator from "./akinator.png";
+import Akinator from "/image/akinator.png";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import useViewportHeight from "../hooks/useViewportHeight"; // Import the custom hook
+import useViewportHeight from "../../hooks/useViewportHeight"; // Import the custom hook
 
 const BathAki: React.FC = () => {
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
@@ -78,14 +78,14 @@ const BathAki: React.FC = () => {
         ) : (
           <>
             <div style={styles.questionContainer}>
-              <img
-                src={Akinator}
-                alt="Akinator"
-                style={{ width: "85%", height: "90%" }}
+              
+              <img src="/image/akinator.png" alt="Akinator" 
+              style={{ width: "85%", height: "90%" }}
               />
+
               <h2 style={styles.question}>質問1/4:</h2>
               <p style={styles.subQuestion}>
-                お風呂いつ入りますか？（複数選択可）
+                お風呂にいつ入りますか？（複数選択可）
               </p>
             </div>
             <div style={styles.optionsContainer}>

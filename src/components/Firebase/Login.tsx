@@ -16,7 +16,7 @@ import { teal } from "@mui/material/colors";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-import { db } from "../firebase/firebase";
+import { db } from "../../firebase/firebase";
 
 export const Login = () => {
   const [email, setEmail] = useState("");

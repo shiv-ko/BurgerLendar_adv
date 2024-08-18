@@ -12,7 +12,6 @@ import {
   Edge,
   Data,
 } from "vis-network/standalone/esm/vis-network";
-import burgerIcon from "./11543-removebg-preview.png"; // 画像のパスを指定
 
 const Header: React.FC = () => {
   const [open, setOpen] = useState(false);
@@ -54,7 +53,7 @@ const Header: React.FC = () => {
         id: newFriendId,
         label: `${newFriendId}`,
         shape: "image",
-        image: burgerIcon,
+        image: 'image/burgerIcon.png',
         size: 50,
       },
     ]);

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import Chat from "./chatGPT/chat";
-import Edu from "./chatGPT/education";
-import Home from "./chatGPT/home";
+import Edu from "./GPT";
+import Home from "./home";
 
 interface AppProps {
   mode: string;
