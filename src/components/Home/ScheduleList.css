@@ -4,8 +4,7 @@
     align-items: center;
     margin: 0 auto;
     padding: 20px;
-    max-width: 600px;
-    background-color: #f4f4f4;
+    background-color: #f9eccb;
 }
 
 h1 {
@@ -33,7 +32,7 @@ h1 {
 }
 
 .schedule-item.current {
-    background-color: #e0f7fa;
+    background-color: grey;
 }
 
 .schedule-item.completed {
@@ -46,10 +45,10 @@ h1 {
     color: #999;
 }
 
-.schedule-item.free-time {
+/* .schedule-item.free-time {
     font-style: italic;
     color: #2196f3;
-}
+} */
 
 .schedule-item.sleep {
     font-style: italic;
@@ -74,17 +73,5 @@ h1 {
     background-color: #e64a19;
 }
 
-/* Add this to remove any extra margin or padding at the bottom */
-body {
-    margin: 0;
-    padding: 0;
-}
 
-html,
-body {
-    height: 100%;
-}
 
-.schedule-container {
-    min-height: 100vh;
-}
