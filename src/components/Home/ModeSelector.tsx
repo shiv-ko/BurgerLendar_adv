@@ -13,7 +13,7 @@ import {
 } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { CSSProperties } from "react";
-import GPT from "../Bur_Home";
+import GPT from "./Control_Home";
 import useViewportHeight from "../../hooks/useViewportHeight"; // Import the custom hook
 
 interface Item {
@@ -309,7 +309,7 @@ const App: React.FC = () => {
                 style={styles.confirmationText}
               >
                 {modes.find((mode) => mode.id === selectedMode)?.label}
-                モードでいいか？
+                モードでいいですか？
               </div>
               <div
                 className="confirmation-buttons"

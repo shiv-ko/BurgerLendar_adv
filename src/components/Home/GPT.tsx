@@ -19,7 +19,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Loading from "./loading/welcometoBurger"; // Import the Loading component
-import './education.css';
+import './GPT.css';
 
 
 interface EduProps {
@@ -63,7 +63,6 @@ const Edu: React.FC<EduProps> = ({ setOutput, mode }) => {
   const [userName, setUserName] = useState<any>(null);
   const [quote, setQuote] = useState<Quote | null>(null);
   const [today, setToday] = useState<string>("");
-  const [countdata, setcountdata] = useState<number>(0);
   const [scheduleText, setScheduleText] = useState<string>(""); // State to hold the generated schedule text
   const [isLoading, setIsLoading] = useState<boolean>(true); // State to manage loading status
   const navigate = useNavigate(); // Use the useNavigate hook from React Router
@@ -103,20 +102,36 @@ const Edu: React.FC<EduProps> = ({ setOutput, mode }) => {
   }, [mode]);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      if (currentUser) {
-        setUser(currentUser);
-        fetchEvents(currentUser.uid);
-        fetchtodos(currentUser.uid);
-        fetchUserName(currentUser.uid);
-        fetchUserAki(currentUser.uid);
-      } else {
-        setUser(null);
-      }
-    });
+  const fetchData = async (userId: string) => {
+    try {
+      // 並行してすべてのデータ取得処理を実行し、完了を待つ
+      const [eventsData, todosData, userName, akiData] = await Promise.all([
+        fetchEvents(userId),
+        fetchEvents(userId),
+        fetchUserName(userId),
+        fetchUserAki(userId)
+      ]);
 
-    return () => unsubscribe();
-  }, []);
+      
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    if (currentUser) {
+      setUser(currentUser);
+      // データ取得処理を呼び出す
+      fetchData(currentUser.uid);
+      handleSubmit();
+    } else {
+      setUser(null);
+    }
+  });
+
+  return () => unsubscribe();
+}, []);
+
 
   /////////////////////////////////////////////////////////
   async function fetchUserAki(userId: string) {
@@ -126,7 +141,6 @@ const Edu: React.FC<EduProps> = ({ setOutput, mode }) => {
       const data = docSnap.data() as aki;
       console.log("aki", data);
       setAki(data);
-      setcountdata(countdata + 1);
       if (docSnap.exists()) {
       } else {
         console.log("No such document!");
@@ -138,7 +152,7 @@ const Edu: React.FC<EduProps> = ({ setOutput, mode }) => {
 
   const fetchEvents = async (userId: string) => {
     try {
-      const eventsRef = query(collection(db, "users", userId, "events"));
+      const eventsRef = query(collection(db, "Users_Act", userId, "events"));
       const querySnapshot = await getDocs(eventsRef);
       const fetchedEvents = querySnapshot.docs.map((doc) => ({
         date: doc.data().date,
@@ -155,7 +169,7 @@ const Edu: React.FC<EduProps> = ({ setOutput, mode }) => {
 
   const fetchtodos = async (userId: string) => {
     try {
-      const eventsRef = query(collection(db, "users", userId, "todos"));
+      const eventsRef = query(collection(db, "users_Act", userId, "todos"));
       const querySnapshot = await getDocs(eventsRef);
       const fetchedTodos = querySnapshot.docs.map((doc) => ({
         Title: doc.data().text,
@@ -163,7 +177,6 @@ const Edu: React.FC<EduProps> = ({ setOutput, mode }) => {
       }));
       console.log("todos", fetchedTodos);
       setScheduleTasks(fetchedTodos);
-      setcountdata(countdata + 1);
     } catch (err) {
       throw new Error("Error fetching user data:");
     }
@@ -177,7 +190,6 @@ const Edu: React.FC<EduProps> = ({ setOutput, mode }) => {
         const data = docSnap.data();
         console.log("username", data?.displayName);
         setUserName(data?.displayName);
-        setcountdata(countdata + 1);
       } else {
         console.log("No such document in Users!");
       }
@@ -186,12 +198,7 @@ const Edu: React.FC<EduProps> = ({ setOutput, mode }) => {
     }
   };
 
-  useEffect(() => {
-    if (countdata < 1) {
-      return;
-    }
-    handleSubmit();
-  }, [countdata]);
+  
 
   const handleSubmit = async () => {
     console.log("aki in handlesubmit", Aki);
@@ -239,9 +246,9 @@ const Edu: React.FC<EduProps> = ({ setOutput, mode }) => {
     hh:mm - Schedule Title
 
     If there is no task, do not write anything about the task.
-    Dont't put in schedule other than the given data. 
+    Don't put in schedule other than the given data. 
 
-    Generate a schedule considering the best times to fit the tasks around the fixed schedule items, optimizing productivity based on the motivation level.
+    Generate ONLY schedule considering the best times to fit the tasks around the fixed schedule items, optimizing productivity based on the motivation level.
         `;
 
     try {

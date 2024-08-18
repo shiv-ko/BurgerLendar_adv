@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import Edu from "./Home/education";
-import Home from "./Home/home";
+import Edu from "./GPT";
+import Home from "./home";
 
 interface AppProps {
   mode: string;

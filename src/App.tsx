@@ -23,10 +23,10 @@ import Memories from "./components/memories";
 import Loading from "./components/Home/loading/welcometoBurger";
 import Profile from "./components/Profile";
 import ModeSelector from "./components/Home/ModeSelector";
-import GPT from "./components/Bur_Home";
-import WebglApp from "./components/webGL/page";
-import ScheduleToBurger from "./components/Home/scheduleToBurger";
+import GPT from "./components/Home/Control_Home";
 import ForgetPassword from "./components/Firebase/password_forget";
+import ScheduleList from "./components/Home/ScheduleList";
+import GenerateBurger from "./components/Home/GenerateBurger";
 
 function App() {
   return (
@@ -48,11 +48,11 @@ function App() {
           <Route path="/todo" element={<ToDo />} />
           <Route path="/memories" element={<Memories />} />
           <Route path="/loading" element={<Loading mode="relax" />} />
-          <Route path="/webgl" element={<WebglApp />} />
-          <Route path="/schedule" element={<ScheduleToBurger />} />
           <Route path="/home" element={<GPT mode="relax" />} />
           <Route path="/homme" element={<Homme />} />
           <Route path="/forgetpass" element={<ForgetPassword />} />
+          <Route path="/dev" element={<ScheduleList/>} />
+          <Route path="/dev2" element={<GenerateBurger/>} />
         </Routes>
       </div>
       <ConditionalFooter />
