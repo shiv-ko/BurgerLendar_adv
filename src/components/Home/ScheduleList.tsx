@@ -114,7 +114,9 @@ const ScheduleList: React.FC = () => {
     <h1>Today's Schedule</h1>
       <div className="schedule-date">{new Date().toLocaleDateString("ja-JP")}</div>
     
-    <ul className="schedule-list">
+    <div className="schedule-content">
+
+      <ul className="schedule-list">
       {scheduleEvents.map((event, index) => {
         const eventStartMinutes = timeToMinutes(event.startTime);
         const eventEndMinutes = timeToMinutes(event.endTime);
@@ -124,7 +126,6 @@ const ScheduleList: React.FC = () => {
 
         // 現在の時間がイベントの終了時間を過ぎている場合、スタイルを変更
         const isPastEvent = currentMinutes > eventEndMinutes;
-
         return (
           <li
             key={index}
@@ -141,9 +142,8 @@ const ScheduleList: React.FC = () => {
         );
       })}
     </ul>
-    <div className="button-container">
-      <GenerateBurger />
     </div>
+    
   </div>
 );
 

@@ -88,6 +88,7 @@ const GenerateBurger: React.FC = () => {
 
   const today = getCurrentDateFormatted();
 
+  // Firebaseから完了したスケジュールを取得
   const fetchCompletedEvents = async (userId: string) => {
     try {
       
@@ -107,7 +108,7 @@ const GenerateBurger: React.FC = () => {
       console.error("Error fetching schedule events:", error);
     }
   };
-
+  // Firebaseにハンバーガー構成を保存
   const saveBurgerConfigToDB = async (config: BurgerConfig) => {
     try {
       const burgerDocRef = doc(db, "Users_Burger", user.uid, "BurgerData", today);
@@ -117,7 +118,8 @@ const GenerateBurger: React.FC = () => {
       console.error("Error saving burger configuration to Firestore:", error);
     }
   };
-
+  
+  // Firebaseにハンバーガー構成を取得する。
   const fetchBurgerConfigFromDB = async () => {
     try {
       const burgerDocRef = doc(db, "Users_Burger", user.uid, "BurgerData",today);
@@ -156,6 +158,10 @@ const GenerateBurger: React.FC = () => {
     }
   }, [userid]); 
 
+
+  //生成ボタンを押した時に呼び出される関数
+  //ハンバーガー構成がすでにある場合は、それを取得してモーダルを開く
+  //ハンバーガー構成がない場合は、OpenAI APIを使用して新しい構成を生成し、Firestoreに保存する
   const generateBurgerConfig = async () => {
     setLoading(true);
 
@@ -201,7 +207,7 @@ const GenerateBurger: React.FC = () => {
 
       const classification = response.data.choices[0].message.content.trim();
       const parsedClassification = JSON.parse(classification);
-
+      //OpenAI APIからのレスポンスをハンバーガー構成として保存
       if (Array.isArray(parsedClassification) && parsedClassification.length === 4) {
         const newConfig: BurgerConfig = {
           includeMeatCount: parsedClassification[0],

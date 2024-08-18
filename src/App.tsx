@@ -51,7 +51,7 @@ function App() {
           <Route path="/home" element={<GPT mode="relax" />} />
           <Route path="/homme" element={<Homme />} />
           <Route path="/forgetpass" element={<ForgetPassword />} />
-          <Route path="/dev" element={<ScheduleList/>} />
+          <Route path="/ScheduleList" element={<ScheduleList/>} />
           <Route path="/dev2" element={<GenerateBurger/>} />
         </Routes>
       </div>
