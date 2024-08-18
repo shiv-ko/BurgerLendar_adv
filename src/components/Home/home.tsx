@@ -79,20 +79,26 @@ const Home: React.FC<HomeProps> = ({ output }) => {
     return year + month + day;
   }
 
-  const handleAddSchedule = async (userId: string) => {
-    const currentDate = getCurrentDateFormatted();
 
-    try {
-      // Users_Schedule コレクション -> userId ドキュメント -> schedule サブコレクション -> currentDate ドキュメント
-      const docRef = doc(db, "Users_Schedule", userId, "schedule", currentDate);
-      console.log(currentDate);
-      await setDoc(docRef, { scheduleEvents });
-      console.log("Event has been added!");
-    } catch (error) {
-      console.error("Error adding event: ", error);
-      console.log("Failed to add event");
-    }
-  };
+
+
+
+const handleAddSchedule = async (userId: string) => {
+  const currentDate = getCurrentDateFormatted();
+
+  try {
+    // Users_Schedule コレクション -> userId ドキュメント -> schedule サブコレクション -> currentDate ドキュメント
+    const scheduleRef = collection(db, "Users_Schedule", userId, "schedule");
+    const docRef = doc(scheduleRef, currentDate);
+    
+    await setDoc(docRef, { scheduleEvents });
+    console.log("Event has been added!");
+  } catch (error) {
+    console.error("Error adding event: ", error);
+    console.log("Failed to add event");
+  }
+};
+
 
 
 
