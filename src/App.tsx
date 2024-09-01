@@ -70,6 +70,8 @@ function ConditionalFooter() {
     "/memories",
     "/profile",
     "/modeselector",
+    "/modeselector",
+    "/ScheduleList",
   ]; // Paths where the footer should be displayed
 
   if (!footerPaths.includes(location.pathname)) {

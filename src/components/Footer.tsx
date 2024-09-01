@@ -40,30 +40,34 @@ const Footer: React.FC = () => {
     }
   }, [location.pathname]);
 
-  const getCurrentDateFormatted = () => {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = (now.getMonth() + 1).toString().padStart(2, '0');
-    const day = now.getDate().toString().padStart(2, '0');
-    return `${year}${month}${day}`; // 'YYYYMMDD'形式で日付を返す
-  };
-
   const handleChange = async (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
     if (newValue === 0) {
       // Firebase Firestoreで今日のスケジュールを確認する
       const currentUser = auth.currentUser;
       if (currentUser) {
-        const today = new Date().toISOString().split('T')[0];
-        const docRef = doc(db, 'users', currentUser.uid, 'schedule', today);
+        const date = new Date();
+        const yy = String(date.getFullYear()).slice(-2);
+        const mm = String(date.getMonth() + 1).padStart(2, '0'); // 月は0始まりなので +1
+        const dd = String(date.getDate()).padStart(2, '0');
+
+        const today= `${yy}${mm}${dd}`;
+
+
+        const docRef = doc(db, 'Users_Schedule', currentUser.uid, 'schedule', today);
         const docSnap = await getDoc(docRef);
+        console.log("data is", docSnap.exists());
+
         if (docSnap.exists()) {
-          navigate('/homme');
+          console.log('Document data:', docSnap.data());
+          navigate('/ScheduleList'); // スケジュールがある場合
+
         } else {
-          navigate('/modeselector');
+          console.log('Document data:', docSnap.data());
+          navigate('/modeselector'); // スケジュールがない場合
         }
       } else {
-        navigate('/homme');
+        navigate('/'); // ログインしていない場合
       }
     } else {
       switch (newValue) {
