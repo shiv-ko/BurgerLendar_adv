@@ -29,37 +29,41 @@ export const Login = () => {
     setShowPassword((prevShowPassword) => !prevShowPassword);
   };
 
-  const handleLogin = async () => {
-    const auth = getAuth();
-    try {
-      console.log("Attempting to sign in...");
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      console.log("User signed in:", user);
+ 
 
-      // カレンダーの存在を確認するロジックを追加
-      const today = new Date();
-      const yy = String(today.getFullYear()).slice(-2);
-      const mm = String(today.getMonth() + 1).padStart(2, '0');
-      const dd = String(today.getDate()).padStart(2, '0');
-      const yymmdd = `${yy}${mm}${dd}`;
-      console.log("Checking for document with date:", yymmdd);
+const handleLogin = async () => {
+  const auth = getAuth();
+  try {
+    console.log("Attempting to sign in...");
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+    console.log("User signed in:", user);
 
-      const docRef = doc(db, 'scehdule', user.uid, 'dates', yymmdd);
-      const docSnap = await getDoc(docRef);
+    // 日付のフォーマットを取得
+    const today = new Date();
+    const yy = String(today.getFullYear()).slice(-2);
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    const yymmdd = `${yy}${mm}${dd}`;
+    console.log("Checking for document with date:", yymmdd);
 
-      if (docSnap.exists()) {
-        console.log("Document exists, navigating to /home");
-        navigate("/home");
-      } else {
-        console.log("Document does not exist, navigating to /modeselector");
-        navigate("/modeselector");
-      }
-    } catch (error) {
-      console.error("Error during login or checking document existence:", error);
-      setError("Failed to log in. Please check your credentials and try again.");
+    // Firestoreで該当するスケジュールを確認
+    const docRef = doc(db, 'Users_Schedule', user.uid, 'schedule', yymmdd);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      console.log("Document exists, navigating to /ScheduleList");
+      navigate("/ScheduleList"); // スケジュールが存在する場合
+    } else {
+      console.log("Document does not exist, navigating to /modeselector");
+      navigate("/modeselector"); // スケジュールが存在しない場合
     }
-  };
+  } catch (error) {
+    console.error("Error during login or checking document existence:", error);
+    setError("Failed to log in. Please check your credentials and try again.");
+  }
+};
+
 
   return (
     <Grid container justifyContent="center" alignItems="center" height="calc(100vh - 120px)">
