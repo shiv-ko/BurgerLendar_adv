@@ -6,6 +6,7 @@ import Unity, { UnityContext } from "react-unity-webgl";
 import html2canvas from "html2canvas";
 
 
+
 interface UnityInstanceUrls {
   dataUrl: string;
   frameworkUrl: string;
@@ -82,26 +83,40 @@ const Memories: React.FC = () => {
     const yymmdd = formatDate(new Date(currentYear, currentMonth, date));
     setSelectedDate(yymmdd);
 
+    console.log("Date clicked:", yymmdd); // 日付がクリックされたことを確認
+
     const db = getFirestore();
     const currentUser = getAuth().currentUser;
 
     if (currentUser) {
-      const docRef = doc(db, "Users_Burger", currentUser.uid, "BurgerData", yymmdd);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        const parsedData: BurgerConfig = {
-          includeMeatCount: parseInt(data.meatCount, 10),
-          includeCheeseCount: parseInt(data.cheeseCount, 10),
-          includeTomatoCount: parseInt(data.tomatoCount, 10),
-          includeLettuceCount: parseInt(data.lettuceCount, 10),
-        };
-        setBurgerConfig(parsedData);
-      } else {
-        setBurgerConfig(null);
+      console.log("User authenticated:", currentUser.uid); // ユーザーが認証されていることを確認
+
+      try {
+        const docRef = doc(db, "Users_Burger", currentUser.uid, "BurgerData", yymmdd);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          console.log("Data retrieved from DB:", data); // データがDBから取得できたことを確認
+          const parsedData: BurgerConfig = {
+            includeMeatCount: parseInt(data.includeMeatCount, 10),
+            includeCheeseCount: parseInt(data.includeCheeseCount, 10),
+            includeTomatoCount: parseInt(data.includeTomatoCount, 10),
+            includeLettuceCount: parseInt(data.includeLettuceCount, 10),
+          };
+          setBurgerConfig(parsedData);
+        } else {
+          console.log("No data found for date:", yymmdd); // データが存在しない場合の確認
+          setBurgerConfig(null);
+        }
+      } catch (error) {
+        console.error("Error retrieving data:", error); // エラーが発生した場合の確認
       }
+    } else {
+      console.log("No authenticated user."); // ユーザーが認証されていない場合の確認
     }
-  };
+};
+
 
   const formatDate = (date: Date) => {
     const year = date.getFullYear().toString().slice(-2);
@@ -154,23 +169,25 @@ const Memories: React.FC = () => {
         preserveDrawingBuffer: true,
       },
     });
-
+  
     useEffect(() => {
       if (burgerConfig) {
+        console.log("Sending data to Unity:", burgerConfig); // Unityに送信するデータを確認
         unityContext.on("loaded", () => {
           unityContext.send("Scripts", "ConfigureBurger", JSON.stringify(burgerConfig));
         });
       }
-    }, [unityContext, burgerConfig]);
-
+    }, [burgerConfig, unityContext]);
+  
     useEffect(() => {
       return () => {
         unityContext.removeAllEventListeners();
       };
     }, [unityContext]);
-
+  
     return <Unity unityContext={unityContext} style={{ width: "95%", height: `${viewportHeight - 450}px` }} />;
   };
+  
 
   const daysInMonth = getDaysInMonth(currentYear, currentMonth);
   const formattedToday = formatDate(today);
