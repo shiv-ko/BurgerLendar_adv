@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getFirestore, collection, getDocs, doc, getDoc } from "firebase/firestore";
-import { getStorage, ref as storageRef, getDownloadURL, uploadString } from "firebase/storage";
+import { getStorage, ref as storageRef, uploadString } from "firebase/storage";
 import Unity, { UnityContext } from "react-unity-webgl";
 import html2canvas from "html2canvas";
-
-
+import ScreenShot from './Shot/ScreenShot';
 
 interface UnityInstanceUrls {
   dataUrl: string;
@@ -38,7 +37,8 @@ const Memories: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [events, setEvents] = useState<string[]>([]);
   const [burgerConfig, setBurgerConfig] = useState<BurgerConfig | null>(null);
-  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const unityRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -79,25 +79,20 @@ const Memories: React.FC = () => {
   }, []);
 
   const handleDateClick = async (date: number) => {
-    setBurgerConfig(null); // 描画を消すために設定をリセット
+    setBurgerConfig(null); 
     const yymmdd = formatDate(new Date(currentYear, currentMonth, date));
     setSelectedDate(yymmdd);
-
-    console.log("Date clicked:", yymmdd); // 日付がクリックされたことを確認
 
     const db = getFirestore();
     const currentUser = getAuth().currentUser;
 
     if (currentUser) {
-      console.log("User authenticated:", currentUser.uid); // ユーザーが認証されていることを確認
-
       try {
         const docRef = doc(db, "Users_Burger", currentUser.uid, "BurgerData", yymmdd);
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
           const data = docSnap.data();
-          console.log("Data retrieved from DB:", data); // データがDBから取得できたことを確認
           const parsedData: BurgerConfig = {
             includeMeatCount: parseInt(data.includeMeatCount, 10),
             includeCheeseCount: parseInt(data.includeCheeseCount, 10),
@@ -106,17 +101,13 @@ const Memories: React.FC = () => {
           };
           setBurgerConfig(parsedData);
         } else {
-          console.log("No data found for date:", yymmdd); // データが存在しない場合の確認
           setBurgerConfig(null);
         }
       } catch (error) {
-        console.error("Error retrieving data:", error); // エラーが発生した場合の確認
+        console.error("Error retrieving data:", error);
       }
-    } else {
-      console.log("No authenticated user."); // ユーザーが認証されていない場合の確認
     }
-};
-
+  };
 
   const formatDate = (date: Date) => {
     const year = date.getFullYear().toString().slice(-2);
@@ -129,7 +120,7 @@ const Memories: React.FC = () => {
     return new Date(year, month + 1, 0).getDate();
   };
 
-  const saveScreenshot = async () => {
+  const handleCaptureScreenshot = async () => {
     if (!unityRef.current || !user || !selectedDate) return;
 
     try {
@@ -140,7 +131,7 @@ const Memories: React.FC = () => {
       squareCanvas.height = squareSize;
       const context = squareCanvas.getContext('2d');
       if (context) {
-        context.fillStyle = '#ffffff'; // Set the background color to white
+        context.fillStyle = '#ffffff';
         context.fillRect(0, 0, squareSize, squareSize);
         context.drawImage(canvas, (squareSize - canvas.width) / 2, (squareSize - canvas.height) / 2);
       }
@@ -151,9 +142,9 @@ const Memories: React.FC = () => {
       const imageRef = storageRef(storage, storagePath);
 
       await uploadString(imageRef, imageData, "data_url");
-      console.log("Screenshot saved successfully");
-      setShowSuccessPopup(true);
-      setTimeout(() => setShowSuccessPopup(false), 3000);
+      setShowSuccessMessage(true);
+      setIsModalOpen(false);
+      setTimeout(() => setShowSuccessMessage(false), 3000);
     } catch (error) {
       console.error("Error saving screenshot: ", error);
     }
@@ -169,32 +160,41 @@ const Memories: React.FC = () => {
         preserveDrawingBuffer: true,
       },
     });
-  
+
     useEffect(() => {
       if (burgerConfig) {
-        console.log("Sending data to Unity:", burgerConfig); // Unityに送信するデータを確認
         unityContext.on("loaded", () => {
           unityContext.send("Scripts", "ConfigureBurger", JSON.stringify(burgerConfig));
         });
       }
     }, [burgerConfig, unityContext]);
-  
+
     useEffect(() => {
       return () => {
         unityContext.removeAllEventListeners();
       };
     }, [unityContext]);
-  
-    return <Unity unityContext={unityContext} style={{ width: "95%", height: `${viewportHeight - 450}px` }} />;
+
+    return (
+      <Unity
+        unityContext={unityContext}
+        style={{
+          position: "absolute",
+          left: 0,
+          right: 0,
+          width: "100%",
+          height: `${viewportHeight - 480}px`,
+        }}
+      />
+    );
   };
-  
 
   const daysInMonth = getDaysInMonth(currentYear, currentMonth);
   const formattedToday = formatDate(today);
 
   return (
     <div className="w-full flex flex-col items-start justify-start" style={{ height: `${viewportHeight - 120}px`, backgroundColor: "#F9ECCB" }}>
-      {showSuccessPopup && <div className="popup">Screenshot saved successfully!</div>}
+      {showSuccessMessage && <div className="popup">Screenshot saved successfully!</div>}
       <div className="header w-full shadow-md rounded-lg overflow-hidden bg-white">
         <div className="flex items-center justify-between p-4" style={{ backgroundColor: "#1a237e" }}>
           <button className="text-gray-500" onClick={() => setCurrentMonth((prev) => (prev === 0 ? 11 : prev - 1))}>
@@ -236,17 +236,26 @@ const Memories: React.FC = () => {
         </div>
       </div>
       {unityInstanceUrl && (
-        <div className="flex">
-          <div ref={unityRef} style={{ width: "95%" }}>
+        <div className="relative" style={{ width: "100%" }}>
+          <div
+            ref={unityRef}
+            style={{
+              position: "relative",
+              width: "100%",
+              height: `${viewportHeight - 480}px`,
+            }}
+            onClick={() => setIsModalOpen(true)}
+            onTouchStart={() => setIsModalOpen(true)} 
+          >
             {burgerConfig && <UnityInstance files={unityInstanceUrl} />}
           </div>
-          {burgerConfig && (
-            <button onClick={saveScreenshot} style={{ marginLeft: "10px", alignSelf: "center" }}>
-              <img src='/image/poteto_icon.png' alt="poteto_icon" />
-            </button>
-          )}
         </div>
       )}
+      <ScreenShot 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        onCapture={handleCaptureScreenshot} 
+      />
       <style>{`
         .calendar {
           display: grid;
