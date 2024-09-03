@@ -143,6 +143,7 @@ const ScheduleList: React.FC = () => {
       })}
     </ul>
     </div>
+    <GenerateBurger />
     
   </div>
 );
