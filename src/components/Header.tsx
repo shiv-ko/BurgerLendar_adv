@@ -150,7 +150,8 @@ const Header: React.FC = () => {
       >
         <MenuIcon />
       </IconButton>
-      <h1 className="title">BurgerLendar</h1>
+      <h1 className="title" style={{ color: '#007bff' }}>BurgerLendar</h1>
+
       <IconButton
         edge="end"
         color="inherit"
