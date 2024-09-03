@@ -1,0 +1,41 @@
+.stylish-button {
+    background-color: #007bff;
+    /* 青色 */
+    color: white;
+    /* テキストの色を白に */
+    border: none;
+    /* ボーダーを削除 */
+    padding: 10px 20px;
+    /* パディングを調整してボタンを大きく */
+    font-size: 16px;
+    /* フォントサイズを調整 */
+    border-radius: 8px;
+    /* ボタンの角を丸く */
+    cursor: pointer;
+    /* カーソルをポインターに */
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    /* スムーズな変化 */
+}
+
+.stylish-button:hover {
+    background-color: #0056b3;
+    /* ホバー時の濃い青色 */
+    transform: translateY(-2px);
+    /* 少し浮き上がるエフェクト */
+}
+
+.stylish-button:active {
+    background-color: #004085;
+    /* クリック時のさらに濃い青色 */
+    transform: translateY(0);
+    /* クリック時にボタンが元に戻る */
+}
+
+.stylish-button:disabled {
+    background-color: #cccccc;
+    /* 無効時の背景色 */
+    cursor: not-allowed;
+    /* 無効時のカーソル */
+    transform: none;
+    /* エフェクトを無効化 */
+}

@@ -6,6 +6,8 @@ import { onAuthStateChanged } from "firebase/auth";
 import Unity, { UnityContext } from "react-unity-webgl";
 import Modal from "react-modal";
 import { isToday } from "date-fns";
+import { Button } from '@mui/base/Button';
+import './GenerateBurger.css';
 
 interface ScheduleEvent {
   title: string;
@@ -236,9 +238,14 @@ const GenerateBurger: React.FC = () => {
   return (
     <div>
       
-      <button onClick={generateBurgerConfig} disabled={loading}>
+      <Button 
+        onClick={generateBurgerConfig} 
+        disabled={loading} 
+        className="stylish-button"
+      >
         {loading ? "Generating..." : "ハンバーガー生成"}
-      </button>
+      </Button>
+
 
       {/* モーダルの表示 */}
       <Modal
@@ -250,10 +257,12 @@ const GenerateBurger: React.FC = () => {
         <button onClick={closeModal}>閉じる</button>
         {burgerConfig && (
           <div>
+            {/*
             <p>Meat Count: {burgerConfig.includeMeatCount}</p>
             <p>Cheese Count: {burgerConfig.includeCheeseCount}</p>
             <p>Tomato Count: {burgerConfig.includeTomatoCount}</p>
             <p>Lettuce Count: {burgerConfig.includeLettuceCount}</p>
+            */}
 
             {/* Webgl コンポーネントの表示 */}
             <Webgl burgerConfig={burgerConfig} />
