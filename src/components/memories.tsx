@@ -40,6 +40,10 @@ const Memories: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [showGenerateButton, setShowGenerateButton] = useState(false);
+  const [isUnityVisible, setIsUnityVisible] = useState(true); // Unity表示の制御用
+
+  // UnityContextを初期化して、再利用するためのuseRef
+  const unityContextRef = useRef<UnityContext | null>(null);
   const unityRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -79,56 +83,68 @@ const Memories: React.FC = () => {
     };
   }, []);
 
+  const handleMonthChange = (direction: "prev" | "next") => {
+    setIsUnityVisible(false); // WebGLを非表示にする
+    if (direction === "prev") {
+      setCurrentMonth((prev) => (prev === 0 ? 11 : prev - 1));
+      if (currentMonth === 0) {
+        setCurrentYear((prev) => prev - 1);
+      }
+    } else {
+      setCurrentMonth((prev) => (prev === 11 ? 0 : prev + 1));
+      if (currentMonth === 11) {
+        setCurrentYear((prev) => prev + 1);
+      }
+    }
+    setTimeout(() => setIsUnityVisible(true), 1000); // 1秒後にWebGLを再表示
+  };
+
   const handleDateClick = async (date: number) => {
     const yymmdd = formatDate(new Date(currentYear, currentMonth, date));
-    setSelectedDate(yymmdd);
 
-    const selectedDate = new Date(currentYear, currentMonth, date);
-    const isBeforeToday = selectedDate < today;
-    const twoDaysAgo = new Date(today);
-    twoDaysAgo.setDate(today.getDate() - 2);
+    // 新しい日付が選択された場合にのみ処理を実行する
+    if (yymmdd !== selectedDate) {
+      setSelectedDate(yymmdd);
+      const selectedDateObj = new Date(currentYear, currentMonth, date);
+      const isBeforeToday = selectedDateObj < today;
+      const twoDaysAgo = new Date(today);
+      twoDaysAgo.setDate(today.getDate() - 2);
 
-    // 選択された日付が当日より前であり、2日前より前の日付であるかチェック
-    if (isBeforeToday && selectedDate <= twoDaysAgo) {
+      if (isBeforeToday && selectedDateObj <= twoDaysAgo) {
         try {
-            const db = getFirestore();
-            const currentUser = getAuth().currentUser;
+          const db = getFirestore();
+          const currentUser = getAuth().currentUser;
 
-            if (currentUser) {
-                const docRef = doc(db, "Users_Burger", currentUser.uid, "BurgerData", yymmdd);
-                const docSnap = await getDoc(docRef);
+          if (currentUser) {
+            const docRef = doc(db, "Users_Burger", currentUser.uid, "BurgerData", yymmdd);
+            const docSnap = await getDoc(docRef);
 
-                // データが存在する場合、ボタンを表示
-                if (docSnap.exists()) {
-                    setShowGenerateButton(true);
-                } else {
-                    setShowGenerateButton(false);
-                }
+            if (docSnap.exists()) {
+              setShowGenerateButton(true);
             } else {
-                setShowGenerateButton(false);
+              setShowGenerateButton(false);
             }
-        } catch (error) {
-            console.error("Error retrieving data:", error);
+          } else {
             setShowGenerateButton(false);
+          }
+        } catch (error) {
+          console.error("Error retrieving data:", error);
+          setShowGenerateButton(false);
         }
-    } else {
+      } else {
         setShowGenerateButton(false);
+      }
+
+      setBurgerConfig(null); // WebGL表示をリセット
     }
-
-    setBurgerConfig(null); // WebGL表示をリセット
-};
-
-
-
+  };
 
   const handleGenerateBurgerClick = async () => {
-    // ボタンが押されたらボタンを非表示にし、WebGLを表示
     setShowGenerateButton(false);
 
-    // Firebaseから既存のハンバーガー構成を取得
     const db = getFirestore();
     const currentUser = getAuth().currentUser;
-    
+
     if (currentUser && selectedDate) {
       try {
         const docRef = doc(db, "Users_Burger", currentUser.uid, "BurgerData", selectedDate);
@@ -144,7 +160,6 @@ const Memories: React.FC = () => {
           };
           setBurgerConfig(parsedData);
         } else {
-          // 新規にハンバーガー構成を生成し保存する処理をここに追加しても良い
           setBurgerConfig(null);
         }
       } catch (error) {
@@ -184,33 +199,35 @@ const Memories: React.FC = () => {
   };
 
   const UnityInstance: React.FC<{ files: UnityInstanceUrls }> = ({ files }) => {
-    const unityContext = new UnityContext({
-      loaderUrl: files.loaderUrl,
-      dataUrl: files.dataUrl,
-      frameworkUrl: files.frameworkUrl,
-      codeUrl: files.codeUrl,
-      webglContextAttributes: {
-        preserveDrawingBuffer: true,
-      },
-    });
+    if (!unityContextRef.current) {
+      unityContextRef.current = new UnityContext({
+        loaderUrl: files.loaderUrl,
+        dataUrl: files.dataUrl,
+        frameworkUrl: files.frameworkUrl,
+        codeUrl: files.codeUrl,
+        webglContextAttributes: {
+          preserveDrawingBuffer: true,
+        },
+      });
+    }
 
     useEffect(() => {
       if (burgerConfig) {
-        unityContext.on("loaded", () => {
-          unityContext.send("Scripts", "ConfigureBurger", JSON.stringify(burgerConfig));
+        unityContextRef.current?.on("loaded", () => {
+          unityContextRef.current?.send("Scripts", "ConfigureBurger", JSON.stringify(burgerConfig));
         });
       }
-    }, [burgerConfig, unityContext]);
+    }, [burgerConfig]);
 
     useEffect(() => {
       return () => {
-        unityContext.removeAllEventListeners();
+        unityContextRef.current?.removeAllEventListeners();
       };
-    }, [unityContext]);
+    }, []);
 
     return (
       <Unity
-        unityContext={unityContext}
+        unityContext={unityContextRef.current}
         style={{
           position: "absolute",
           left: 0,
@@ -240,11 +257,11 @@ const Memories: React.FC = () => {
       {showSuccessMessage && <div className="popup">Screenshot saved successfully!</div>}
       <div className="header w-full shadow-md rounded-lg overflow-hidden bg-white">
         <div className="flex items-center justify-between p-4" style={{ backgroundColor: "#1a237e" }}>
-          <button className="text-gray-500" onClick={() => setCurrentMonth((prev) => (prev === 0 ? 11 : prev - 1))}>
+          <button className="text-gray-500" onClick={() => handleMonthChange("prev")}>
             &lt;
           </button>
           <h2 className="text-lg font-bold text-white cursor-pointer">{`${currentYear}年${currentMonth + 1}月`}</h2>
-          <button className="text-gray-500" onClick={() => setCurrentMonth((prev) => (prev === 11 ? 0 : prev + 1))}>
+          <button className="text-gray-500" onClick={() => handleMonthChange("next")}>
             &gt;
           </button>
         </div>
@@ -279,7 +296,6 @@ const Memories: React.FC = () => {
         </div>
       </div>
 
-      {/* ハンバーガー生成ボタン */}
       {showGenerateButton && (
         <div className="absolute left-0 right-0 flex items-center justify-center" style={{ top: "50%", transform: "translateY(-50%)" }}>
           <button
@@ -299,7 +315,7 @@ const Memories: React.FC = () => {
         </div>
       )}
 
-      {unityInstanceUrl && burgerConfig && (
+      {isUnityVisible && unityInstanceUrl && burgerConfig && (
         <div className="relative" style={{ width: "100%" }}>
           <div
             ref={unityRef}
