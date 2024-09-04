@@ -39,6 +39,7 @@ const Memories: React.FC = () => {
   const [burgerConfig, setBurgerConfig] = useState<BurgerConfig | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [showGenerateButton, setShowGenerateButton] = useState(false);
   const unityRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -79,16 +80,63 @@ const Memories: React.FC = () => {
   }, []);
 
   const handleDateClick = async (date: number) => {
-    setBurgerConfig(null); 
     const yymmdd = formatDate(new Date(currentYear, currentMonth, date));
     setSelectedDate(yymmdd);
 
+    const selectedDate = new Date(currentYear, currentMonth, date);
+    const isBeforeToday = selectedDate < today;
+    const isSameAsToday = selectedDate.toDateString() === today.toDateString();
+    const twoDaysAgo = new Date(today);
+    twoDaysAgo.setDate(today.getDate() - 2);
+
+    // 選択された日付が当日より前かつ2日以上前である場合のみボタンを表示
+    if (isBeforeToday && selectedDate > twoDaysAgo) {
+        try {
+            const db = getFirestore();
+            const currentUser = getAuth().currentUser;
+
+            if (currentUser) {
+                const docRef = doc(db, "Users_Burger", currentUser.uid, "BurgerData", yymmdd);
+                const docSnap = await getDoc(docRef);
+
+                // データが存在しない場合、ボタンを表示
+                if (!docSnap.exists()) {
+                    setShowGenerateButton(true);
+                } else {
+                    setShowGenerateButton(false);
+                }
+            } else {
+                setShowGenerateButton(false);
+            }
+        } catch (error) {
+            console.error("Error retrieving data:", error);
+            setShowGenerateButton(false);
+        }
+    } else {
+        setShowGenerateButton(false);
+    }
+
+    // 当日の場合はボタンを表示しない
+    if (isSameAsToday) {
+        setShowGenerateButton(false);
+    }
+
+    setBurgerConfig(null); // WebGL表示をリセット
+};
+
+
+
+  const handleGenerateBurgerClick = async () => {
+    // ボタンが押されたらボタンを非表示にし、WebGLを表示
+    setShowGenerateButton(false);
+
+    // Firebaseから既存のハンバーガー構成を取得
     const db = getFirestore();
     const currentUser = getAuth().currentUser;
-
-    if (currentUser) {
+    
+    if (currentUser && selectedDate) {
       try {
-        const docRef = doc(db, "Users_Burger", currentUser.uid, "BurgerData", yymmdd);
+        const docRef = doc(db, "Users_Burger", currentUser.uid, "BurgerData", selectedDate);
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
@@ -101,23 +149,13 @@ const Memories: React.FC = () => {
           };
           setBurgerConfig(parsedData);
         } else {
+          // 新規にハンバーガー構成を生成し保存する処理をここに追加しても良い
           setBurgerConfig(null);
         }
       } catch (error) {
         console.error("Error retrieving data:", error);
       }
     }
-  };
-
-  const formatDate = (date: Date) => {
-    const year = date.getFullYear().toString().slice(-2);
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const day = date.getDate().toString().padStart(2, "0");
-    return `${year}${month}${day}`;
-  };
-
-  const getDaysInMonth = (year: number, month: number) => {
-    return new Date(year, month + 1, 0).getDate();
   };
 
   const handleCaptureScreenshot = async () => {
@@ -189,8 +227,18 @@ const Memories: React.FC = () => {
     );
   };
 
+  const formatDate = (date: Date) => {
+    const year = date.getFullYear().toString().slice(-2);
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
+    return `${year}${month}${day}`;
+  };
+
+  const getDaysInMonth = (year: number, month: number) => {
+    return new Date(year, month + 1, 0).getDate();
+  };
+
   const daysInMonth = getDaysInMonth(currentYear, currentMonth);
-  const formattedToday = formatDate(today);
 
   return (
     <div className="w-full flex flex-col items-start justify-start" style={{ height: `${viewportHeight - 120}px`, backgroundColor: "#F9ECCB" }}>
@@ -235,7 +283,28 @@ const Memories: React.FC = () => {
           })}
         </div>
       </div>
-      {unityInstanceUrl && (
+
+      {/* ハンバーガー生成ボタン */}
+      {showGenerateButton && (
+        <div className="absolute left-0 right-0 flex items-center justify-center" style={{ top: "50%", transform: "translateY(-50%)" }}>
+          <button
+            onClick={handleGenerateBurgerClick}
+            style={{
+              backgroundColor: "#4CAF50",
+              color: "white",
+              padding: "10px 20px",
+              borderRadius: "20px",
+              border: "none",
+              cursor: "pointer",
+              fontSize: "16px",
+            }}
+          >
+            ハンバーガー生成
+          </button>
+        </div>
+      )}
+
+      {unityInstanceUrl && burgerConfig && (
         <div className="relative" style={{ width: "100%" }}>
           <div
             ref={unityRef}
@@ -247,15 +316,17 @@ const Memories: React.FC = () => {
             onClick={() => setIsModalOpen(true)}
             onTouchStart={() => setIsModalOpen(true)} 
           >
-            {burgerConfig && <UnityInstance files={unityInstanceUrl} />}
+            <UnityInstance files={unityInstanceUrl} />
           </div>
         </div>
       )}
+
       <ScreenShot 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
         onCapture={handleCaptureScreenshot} 
       />
+
       <style>{`
         .calendar {
           display: grid;
