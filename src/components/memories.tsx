@@ -85,12 +85,11 @@ const Memories: React.FC = () => {
 
     const selectedDate = new Date(currentYear, currentMonth, date);
     const isBeforeToday = selectedDate < today;
-    const isSameAsToday = selectedDate.toDateString() === today.toDateString();
     const twoDaysAgo = new Date(today);
     twoDaysAgo.setDate(today.getDate() - 2);
 
-    // 選択された日付が当日より前かつ2日以上前である場合のみボタンを表示
-    if (isBeforeToday && selectedDate > twoDaysAgo) {
+    // 選択された日付が当日より前であり、2日前より前の日付であるかチェック
+    if (isBeforeToday && selectedDate <= twoDaysAgo) {
         try {
             const db = getFirestore();
             const currentUser = getAuth().currentUser;
@@ -99,8 +98,8 @@ const Memories: React.FC = () => {
                 const docRef = doc(db, "Users_Burger", currentUser.uid, "BurgerData", yymmdd);
                 const docSnap = await getDoc(docRef);
 
-                // データが存在しない場合、ボタンを表示
-                if (!docSnap.exists()) {
+                // データが存在する場合、ボタンを表示
+                if (docSnap.exists()) {
                     setShowGenerateButton(true);
                 } else {
                     setShowGenerateButton(false);
@@ -116,13 +115,9 @@ const Memories: React.FC = () => {
         setShowGenerateButton(false);
     }
 
-    // 当日の場合はボタンを表示しない
-    if (isSameAsToday) {
-        setShowGenerateButton(false);
-    }
-
     setBurgerConfig(null); // WebGL表示をリセット
 };
+
 
 
 
