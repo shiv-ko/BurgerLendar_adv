@@ -11,7 +11,7 @@ const commonStyles = {
   header: {
     width: "100%",
     textAlign: "center" as "center",
-    backgroundColor: "#1d3557",
+    backgroundColor: "#fff",
     padding: "10px 0",
   },
   title: {
@@ -25,7 +25,7 @@ const commonStyles = {
     display: "flex",
     flexDirection: "column" as "column",
     alignItems: "center",
-    backgroundColor: "#F9ECCB",
+    backgroundColor: "#fff",
     padding: "20px",
     borderRadius: "10px",
     height: "800px",
@@ -64,6 +64,7 @@ const commonStyles = {
     color: "#000",
   },
   submitButton: {
+    backgroundColor: "#f4a261",
     color: "#1d3557",
     border: "none",
     padding: "10px 20px",
