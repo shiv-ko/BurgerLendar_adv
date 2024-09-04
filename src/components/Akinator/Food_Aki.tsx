@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { collection, doc, setDoc, serverTimestamp } from "firebase/firestore";
-import { auth, db } from "../../firebase/firebase"; // Import the initialized Firestore instance
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { auth, db } from "../../firebase/firebase";
 import { onAuthStateChanged } from "firebase/auth";
-import { useNavigate } from "react-router-dom"; // useNavigateをインポート
+import { useNavigate } from "react-router-dom";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import useViewportHeight from "../../hooks/useViewportHeight"; // Import the custom hook
+import useViewportHeight from "../../hooks/useViewportHeight"; 
+import styles from './CommonStyles';
 
 const FoodAki: React.FC = () => {
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [user, setUser] = useState<any>(null);
   const navigate = useNavigate();
   const [showCheckmark, setShowCheckmark] = useState<boolean>(false);
-  const viewportHeight = useViewportHeight(); // Use the custom hook
+  const viewportHeight = useViewportHeight();
 
-  // Monitor auth state
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -76,7 +76,7 @@ const FoodAki: React.FC = () => {
           <>
             <div style={styles.questionContainer}>
               <img src="/image/akinator.png" alt="Akinator" 
-              style={{ width: "85%", height: "90%" }}
+              style={styles.akinatorImage}
               />
               
               <h2 style={styles.question}>質問2/4:</h2>
@@ -109,78 +109,5 @@ const FoodAki: React.FC = () => {
     </div>
   );
 };
-const styles = {
-  container: {
-    display: "flex",
-    flexDirection: "column" as "column",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#1d3557",
-    color: "#f4a261",
-  },
-  header: {
-    width: "100%",
-    textAlign: "center" as "center",
-    backgroundColor: "#1d3557",
-    padding: "10px 0",
-  },
-  title: {
-    fontSize: "2.5em",
-    margin: "0",
-  },
-  main: {
-    display: "flex",
-    flexDirection: "column" as "column",
-    alignItems: "center",
-    backgroundColor: "#f1faee",
-    padding: "20px",
-    borderRadius: "10px",
-  },
-  questionContainer: {
-    textAlign: "center" as "center",
-    marginBottom: "20px",
-  },
-  question: {
-    fontSize: "1.5em",
-    margin: "0",
-    color: "#000",
-  },
-  subQuestion: {
-    fontSize: "1em",
-    margin: "0",
-    color: "#000",
-  },
-  optionsContainer: {
-    display: "flex",
-    flexDirection: "column" as "column",
-    width: "100%",
-    alignItems: "center",
-  },
-  optionButton: {
-    width: "80%",
-    padding: "10px 0",
-    margin: "10px 0",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-    fontSize: "1em",
-    color: "#000",
-  },
-  submitButton: {
-    backgroundColor: "#f4a261",
-    color: "#1d3557",
-    border: "none",
-    padding: "10px 20px",
-    margin: "20px 0 0 0",
-    fontSize: "1em",
-    borderRadius: "5px",
-    cursor: "pointer",
-  },
-  checkmark: {
-    fontSize: "4em",
-    color: "#f4a261",
-  },
-};
-
 
 export default FoodAki;
