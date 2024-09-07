@@ -21,7 +21,7 @@ React/TypeScript
 FireBase    
 OpenAI API    
 Tailwindcss    
-Brendar    
+Blendar    
 Unity     
 OpeanWeather API    
 Figma    
